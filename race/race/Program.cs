@@ -27,11 +27,13 @@ namespace race
     {
 
         // das Beispiel-Objekt
-        private ObjLoaderObject3D raceTrack;
+        private ObjLoaderObject3D objRaceTrack;
+        private ObjLoaderObject3D objRaceCar;
 
 
         // unsere textur-ID
-        private int textureID;
+        private int texRaceTrack;
+        private int texRaceCar;
         private int normalTextureID;
 
         // Materialien
@@ -59,10 +61,12 @@ namespace race
             Camera.SetWidthHeightFov(800, 600, 60);
 
             // Das Objekt laden
-            raceTrack = new ObjLoaderObject3D("data/objects/testTrack.obj", 1.0f, true);
+            objRaceTrack = new ObjLoaderObject3D("data/objects/testTrack.obj", 1.0f, true);
+            objRaceCar = new ObjLoaderObject3D("data/objects/car2.obj", 1.0f, true);
 
             // Die Textur laden
-            textureID = TextureManager.LoadTexture("data/textures/single_color.png");
+            texRaceTrack = TextureManager.LoadTexture("data/textures/street.png");
+            texRaceCar = TextureManager.LoadTexture("data/textures/single_color.png");
             normalTextureID = TextureManager.LoadTexture("data/textures/brick_normal.png");
 
 
@@ -83,7 +87,8 @@ namespace race
             GL.CullFace(CullFaceMode.Front);
 
             // Kameraposition setzen
-            Camera.SetLookAt(new Vector3(0, 0, 3), new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+            Camera.SetLookAt(new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+            
 
             // Licht setzen
             Light.SetDirectionalLight(new Vector3(1, 1, 1), new Vector4(0.5f, 0.5f, 0.5f, 1), new Vector4(1.0f, 1.0f, 1.0f, 0.0f), new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -116,13 +121,16 @@ namespace race
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             //Objekt Transformation
-            raceTrack.Transformation = Matrix4.Identity;
-            raceTrack.Transformation *= Matrix4.CreateTranslation(0,-3,0);
+            objRaceTrack.Transformation = Matrix4.Identity;
+            objRaceTrack.Transformation *= Matrix4.CreateTranslation(0,-3,0);
 
+            objRaceCar.Transformation = Matrix4.Identity;
+            objRaceCar.Transformation *= Matrix4.CreateTranslation(-10, -2, 0);
 
-            // Objekt wird gezeichnet
-            //normalMappingMaterial.Draw(exampleObject, textureID, normalTextureID, 25.0f);
-            ambientDiffuseMaterial.Draw(raceTrack, normalTextureID);
+            // Objekte wird gezeichnet
+            normalMappingMaterial.Draw(objRaceCar, texRaceCar, normalTextureID, 25.0f);
+            ambientDiffuseMaterial.Draw(objRaceTrack, texRaceTrack);
+            //ambientDiffuseMaterial.Draw(objRaceCar, texRaceCar);
 
             SwapBuffers();
         }
@@ -131,7 +139,7 @@ namespace race
 
         protected override void OnUnload(EventArgs e)
         {
-            raceTrack.UnLoad();
+            objRaceTrack.UnLoad();
         }
 
 
