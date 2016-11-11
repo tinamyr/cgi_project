@@ -27,7 +27,7 @@ namespace race
     {
 
         // das Beispiel-Objekt
-        private ObjLoaderObject3D exampleObject;
+        private ObjLoaderObject3D raceTrack;
 
 
         // unsere textur-ID
@@ -59,7 +59,7 @@ namespace race
             Camera.SetWidthHeightFov(800, 600, 60);
 
             // Das Objekt laden
-            exampleObject = new ObjLoaderObject3D("data/objects/torus_flat.obj", 1.0f, true);
+            raceTrack = new ObjLoaderObject3D("data/objects/testTrack.obj", 1.0f, true);
 
             // Die Textur laden
             textureID = TextureManager.LoadTexture("data/textures/single_color.png");
@@ -115,12 +115,14 @@ namespace race
             // Der Screen und er Tiefenpuffer (z-Buffer) wird gelöscht
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            exampleObject.Transformation = Matrix4.CreateRotationX(updateCounter / 150.0f);
-            exampleObject.Transformation *= Matrix4.CreateRotationY(updateCounter / 110.0f);
+            //Objekt Transformation
+            raceTrack.Transformation = Matrix4.Identity;
+            raceTrack.Transformation *= Matrix4.CreateTranslation(0,-3,0);
+
 
             // Objekt wird gezeichnet
-            normalMappingMaterial.Draw(exampleObject, textureID, normalTextureID, 25.0f);
-
+            //normalMappingMaterial.Draw(exampleObject, textureID, normalTextureID, 25.0f);
+            ambientDiffuseMaterial.Draw(raceTrack, normalTextureID);
 
             SwapBuffers();
         }
@@ -129,7 +131,7 @@ namespace race
 
         protected override void OnUnload(EventArgs e)
         {
-            exampleObject.UnLoad();
+            raceTrack.UnLoad();
         }
 
 
