@@ -25,6 +25,11 @@ namespace race
 
     public class CubeExample : GameWindow
     {
+        // -- moving object
+        private float yRotation = 0.0f;
+        private float positionX = 0.0f;
+        private float positionZ = 0.0f;
+        private float speed = 0.0f;
 
         // das Beispiel-Objekt
         private ObjLoaderObject3D objRaceTrack;
@@ -87,8 +92,9 @@ namespace race
             GL.CullFace(CullFaceMode.Front);
 
             // Kameraposition setzen
-            Camera.SetLookAt(new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0));
-            
+                // x=Links, y=Hoch, z=Vor ; x=, y=Up, z= ; x=, y=Up, z= ; 
+            Camera.SetLookAt(new Vector3(0, 4, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+
 
             // Licht setzen
             Light.SetDirectionalLight(new Vector3(1, 1, 1), new Vector4(0.5f, 0.5f, 0.5f, 1), new Vector4(1.0f, 1.0f, 1.0f, 0.0f), new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -110,13 +116,69 @@ namespace race
             updateCounter++;
 
 
-            Camera.updateFlyCamera(Keyboard[OpenTK.Input.Key.Left], Keyboard[OpenTK.Input.Key.Right], Keyboard[OpenTK.Input.Key.Up], Keyboard[OpenTK.Input.Key.Down]);
+            //Camera.updateFlyCamera(Keyboard[OpenTK.Input.Key.Left], Keyboard[OpenTK.Input.Key.Right], Keyboard[OpenTK.Input.Key.Up], Keyboard[OpenTK.Input.Key.Down]);
 
+            // Camera initalisierung ohne Werte -> keine Bewegung mehr möglich
+            Camera.updateFlyCamera(false, false, false, false);
+
+            //Methode fuer die Berechnung neuer Position
+            moveObject(Keyboard[OpenTK.Input.Key.Left], Keyboard[OpenTK.Input.Key.Right], Keyboard[OpenTK.Input.Key.Up], Keyboard[OpenTK.Input.Key.Down]);
+
+            // Car nach errechneten Werten versetzen
+            objRaceCar.Transformation = Matrix4.Identity;
+            objRaceCar.Transformation *= Matrix4.CreateRotationY(yRotation);
+            objRaceCar.Transformation *= Matrix4.CreateTranslation(positionX, 0, positionZ);
+        }
+
+        // ---------------------------
+        // Methode um das Auto zu bewegen 
+        //   -> Bei Drehung muss es Anteilig in X und Z Richtung fahren
+        //   !!!! - Geht noch nicht wirkich muss 360Grad drehen und bewegen - !!!
+        public void moveObject(bool left, bool right, bool up, bool down)
+        {
+            // Berechnen des X,Z Wertes 
+            float procent = yRotation / 1.6f;
+            positionX = positionZ * procent;
+            positionZ -= 1.0f * speed;
+
+            if (left)   // 1.6 => 180Grad 
+            {
+                if (yRotation < 1.6f)
+                {
+                    yRotation += 0.02f;
+                }
+
+            }
+            if (right)
+            {
+                if (yRotation > -1.6f)
+                {
+                    yRotation -= 0.02f;
+                }
+
+            }
+            if (up)
+            {
+                if (speed < 0.10f) // Maximal Geschwindigkeit 0.1f
+                {
+                    speed += 0.002f;
+                }
+
+            }
+            if (down)
+            {
+                if (speed > -0.10f)
+                {
+                    speed -= 0.002f;
+                }
+            }
         }
 
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+
+
             // Der Screen und er Tiefenpuffer (z-Buffer) wird gelöscht
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -124,8 +186,8 @@ namespace race
             objRaceTrack.Transformation = Matrix4.Identity;
             objRaceTrack.Transformation *= Matrix4.CreateTranslation(0,-3,0);
 
-            objRaceCar.Transformation = Matrix4.Identity;
-            objRaceCar.Transformation *= Matrix4.CreateTranslation(-10, -2, 0);
+            //objRaceCar.Transformation = Matrix4.Identity;
+            //objRaceCar.Transformation *= Matrix4.CreateTranslation(-10, -2, 0);
 
             // Objekte wird gezeichnet
             normalMappingMaterial.Draw(objRaceCar, texRaceCar, normalTextureID, 25.0f);
